@@ -1,4 +1,4 @@
-HOST0=isucon@35.77.73.48
+HOST0=isucon@52.197.181.153
 HOST1=isucon@18.176.52.57
 HOST2=isucon@54.95.29.70
 HOST3=isucon@54.95.53.252
@@ -7,7 +7,7 @@ TIMEID := $(shell date +%Y%m%d-%H%M%S)
 
 # https://github.com/hirosuzuki/perf-logs-viewer
 # https://github.com/hirosuzuki/go-sql-logger
-
+# https://github.com/mnsys/isucon10q-etude
 
 build:
 	go build -o isucon
