@@ -15,6 +15,8 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/sessions"
+	_ "github.com/hirosuzuki/go-sql-logger"
+	"github.com/hirosuzuki/go-sql-logger/pprofiler"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -56,7 +58,7 @@ func connectDB() (*sqlx.DB, error) {
 	config.ParseTime = true
 
 	dsn := config.FormatDSN()
-	return sqlx.Open("mysql", dsn)
+	return sqlx.Open("mysql"+os.Getenv("MYSQL_DRIVER_POSTFIX"), dsn)
 }
 
 type renderer struct {
@@ -1730,6 +1732,8 @@ func isAdminUser(account string) bool {
 // DBの初期化処理
 // auto generated dump data 20220424_0851 size prod
 func initializeHandler(c echo.Context) error {
+	pprofiler.Start(100)
+
 	lastCreatedAt := "2022-05-13 09:00:00.000"
 	ctx := c.Request().Context()
 

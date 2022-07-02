@@ -29,3 +29,24 @@ deploy-1-web:
 	ssh ${HOST1} sudo nginx -t
 	ssh ${HOST1} sudo systemctl restart nginx	
 
+perf-logs-viewer:
+	# go install https://github.com/hirosuzuki/perf-logs-viewer:latest
+	perf-logs-viewer
+
+pprof:
+	go tool pprof -http="127.0.0.1:8081" logs/latest/cpu-web1.pprof
+
+collect-logs:
+	mkdir -p logs/${TIMEID}
+	rm -f logs/latest
+	ln -sf ${TIMEID} logs/latest
+	scp ${HOST1}:/tmp/cpu.pprof logs/latest/cpu-web1.pprof
+	ssh ${HOST1} sudo chmod 644 /var/log/nginx/access.log
+	scp ${HOST1}:/var/log/nginx/access.log logs/latest/access-web1.log
+	scp ${HOST1}:/tmp/sql.log logs/latest/sql-web1.log
+	ssh ${HOST1} sudo truncate -c -s 0 /var/log/nginx/access.log
+	ssh ${HOST1} sudo truncate -c -s 0 /tmp/sql.log
+
+truncate-logs:
+	ssh ${HOST1} sudo truncate -c -s 0 /var/log/nginx/access.log
+	ssh ${HOST1} sudo truncate -c -s 0 /tmp/sql.log

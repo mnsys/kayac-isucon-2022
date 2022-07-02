@@ -3,3 +3,7 @@ ISUCON_DB_PORT=13306
 ISUCON_DB_USER=isucon
 ISUCON_DB_PASSWORD=isucon
 ISUCON_DB_NAME=isucon_listen80
+
+MYSQL_DRIVER_POSTFIX=:logger
+SQL_LOGFILE=/tmp/sql.log
+CPU_PROFILE_FILE=/tmp/cpu.pprof
