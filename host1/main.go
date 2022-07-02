@@ -77,9 +77,9 @@ func cacheControllPrivate(next echo.HandlerFunc) echo.HandlerFunc {
 func main() {
 	e := echo.New()
 	e.Debug = true
-	e.Logger.SetLevel(log.DEBUG)
+	e.Logger.SetLevel(log.DEBUG) // TODO:はずす
 
-	e.Use(middleware.Logger())
+	e.Use(middleware.Logger()) // TODO:はずす
 	e.Use(middleware.Recover())
 	e.Use(cacheControllPrivate)
 
@@ -116,7 +116,7 @@ func main() {
 	db.SetMaxOpenConns(10)
 	defer db.Close()
 
-	sessionStore, err = mysqlstore.NewMySQLStoreFromConnection(db.DB, "sessions_golang", "/", 86400, []byte("powawa"))
+	sessionStore, err = mysqlstore.NewMySQLStoreFromConnection(db.DB, "sessions_golang", "/", 86400, []byte("powawa")) // Hint:MySQL Session
 	if err != nil {
 		e.Logger.Fatalf("failed to initialize session store: %v", err)
 		return
@@ -169,6 +169,7 @@ func errorResponse(c echo.Context, code int, message string) error {
 }
 
 func validateSession(c echo.Context) (*UserRow, bool, error) {
+	// Hint:毎回チェックしてる？
 	sess, err := getSession(c.Request())
 	if err != nil {
 		return nil, false, fmt.Errorf("error getSession: %w", err)
@@ -199,7 +200,7 @@ func validateSession(c echo.Context) (*UserRow, bool, error) {
 }
 
 func generatePasswordHash(password string) (string, error) {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), 11)
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), 11) // Hint:暗号重い？
 	if err != nil {
 		return "", fmt.Errorf("error bcrypt.GenerateFromPassword: %w", err)
 	}
@@ -207,7 +208,7 @@ func generatePasswordHash(password string) (string, error) {
 }
 
 func comparePasswordHash(newPassword, passwordHash string) (bool, error) {
-	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(newPassword)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(newPassword)); err != nil { // Hint:暗号重い？
 		if err == bcrypt.ErrMismatchedHashAndPassword {
 			return false, nil
 		}
@@ -297,7 +298,7 @@ func authPageHandler(c echo.Context) error {
 
 func getPlaylistByULID(ctx context.Context, db connOrTx, playlistULID string) (*PlaylistRow, error) {
 	var row PlaylistRow
-	if err := db.GetContext(ctx, &row, "SELECT * FROM playlist WHERE `ulid` = ?", playlistULID); err != nil {
+	if err := db.GetContext(ctx, &row, "SELECT * FROM playlist WHERE `ulid` = ?", playlistULID); err != nil { //TODO:indexなし
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -325,7 +326,7 @@ type connOrTx interface {
 
 func getSongByULID(ctx context.Context, db connOrTx, songULID string) (*SongRow, error) {
 	var row SongRow
-	if err := db.GetContext(ctx, &row, "SELECT * FROM song WHERE `ulid` = ?", songULID); err != nil {
+	if err := db.GetContext(ctx, &row, "SELECT * FROM song WHERE `ulid` = ?", songULID); err != nil { // TODO:noindex
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -347,7 +348,7 @@ func isFavoritedBy(ctx context.Context, db connOrTx, userAccount string, playlis
 			userAccount, playlistID, err,
 		)
 	}
-	return count > 0, nil
+	return count > 0, nil // TODO:存在確認だけでいいのでは？
 }
 
 func getFavoritesCountByPlaylistID(ctx context.Context, db connOrTx, playlistID int) (int, error) {
@@ -355,7 +356,7 @@ func getFavoritesCountByPlaylistID(ctx context.Context, db connOrTx, playlistID 
 	if err := db.GetContext(
 		ctx,
 		&count,
-		"SELECT COUNT(*) AS cnt FROM playlist_favorite where playlist_id = ?",
+		"SELECT COUNT(*) AS cnt FROM playlist_favorite where playlist_id = ?", //TODO:noindex
 		playlistID,
 	); err != nil {
 		return 0, fmt.Errorf(
@@ -401,6 +402,7 @@ func getRecentPlaylistSummaries(ctx context.Context, db connOrTx, userAccount st
 
 	playlists := make([]Playlist, 0, len(allPlaylists))
 	for _, playlist := range allPlaylists {
+		// TODO:N+1
 		user, err := getUserByAccount(ctx, db, playlist.UserAccount)
 		if err != nil {
 			return nil, fmt.Errorf("error getUserByAccount: %w", err)
@@ -467,6 +469,7 @@ func getPopularPlaylistSummaries(ctx context.Context, db connOrTx, userAccount s
 	}
 	playlists := make([]Playlist, 0, len(popular))
 	for _, p := range popular {
+		// TODO:N+1
 		playlist, err := getPlaylistByID(ctx, db, p.PlaylistID)
 		if err != nil {
 			return nil, fmt.Errorf("error getPlaylistByID: %w", err)
@@ -550,6 +553,7 @@ func getCreatedPlaylistSummariesByUserAccount(ctx context.Context, db connOrTx, 
 
 	results := make([]Playlist, 0, len(playlists))
 	for _, row := range playlists {
+		// TODO:N+1
 		songCount, err := getSongsCountByPlaylistID(ctx, db, row.ID)
 		if err != nil {
 			return nil, fmt.Errorf("error getSongsCountByPlaylistID: %w", err)

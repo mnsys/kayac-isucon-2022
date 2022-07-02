@@ -19,3 +19,13 @@ deploy: build
 
 host1:
 	ssh ${HOST1}
+
+deploy-1-web:
+	ssh ${HOST1} docker-compose -f webapp/docker-compose.yml down
+	scp docker-compose.yml ${HOST1}:/home/isucon/webapp/docker-compose.yml
+	ssh ${HOST1} docker-compose -f webapp/docker-compose.yml up -d
+	cat nginx/nginx.conf | ssh ${HOST1} sudo tee /etc/nginx/nginx.conf >/dev/null
+	cat nginx/default | ssh ${HOST1} sudo tee /etc/nginx/sites-available/default >/dev/null
+	ssh ${HOST1} sudo nginx -t
+	ssh ${HOST1} sudo systemctl restart nginx	
+
