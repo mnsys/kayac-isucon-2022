@@ -1,0 +1,16 @@
+[Unit]
+Description=isucon.go
+
+[Service]
+WorkingDirectory=/home/isucon/webapp/golang
+EnvironmentFile=/home/isucon/webapp/golang/env.sh
+
+User=isucon
+Group=isucon
+ExecStart=/home/isucon/webapp/golang/isucon
+
+Restart   = always
+Type      = simple
+
+[Install]
+WantedBy=multi-user.target
