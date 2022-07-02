@@ -1,7 +1,7 @@
 HOST0=isucon@52.197.181.153
-HOST1=isucon@18.176.52.57
-HOST2=isucon@54.95.29.70
-HOST3=isucon@54.95.53.252
+HOST1=isucon@35.79.118.71
+HOST2=isucon@13.114.36.63
+HOST3=isucon@52.69.16.88
 
 TIMEID := $(shell date +%Y%m%d-%H%M%S)
 
