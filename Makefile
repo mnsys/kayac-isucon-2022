@@ -40,6 +40,8 @@ fetch-conf:
 	scp ${HOST1}:/etc/systemd/system/isuumo.go.service files
 	scp ${HOST1}:/etc/nginx/nginx.conf files
 	scp ${HOST1}:/etc/mysql/my.cnf files
+	scp ${HOST1}:/home/isucon/webapp/golang/*.go .
+	scp ${HOST1}:/home/isucon/webapp/golang/go.* .
 
 
 perf-logs-viewer:
